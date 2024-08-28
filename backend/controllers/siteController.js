@@ -1,5 +1,7 @@
 // controllers/siteController.js
 const  Site = require('../models/site');
+const Image = require('../models/image'); 
+
 
 exports.createSite = async (req, res) => {
   try {
@@ -62,3 +64,25 @@ exports.deleteSite = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Nouvelle méthode pour obtenir les sites par ID de sous-catégorie
+exports.getSitesBySubcategoryId = async (req, res) => {
+    try {
+      const subcategoryId = req.params.subcategoryId;
+      const sites = await Site.findAll({
+        where: { subcategoryId: subcategoryId },
+        include: [{
+          model: Image,        // Inclure les images associées
+          attributes: ['id', 'imageUrl'], // Spécifier les attributs d'image à inclure
+        }]
+      });
+  
+      if (sites.length > 0) {
+        res.status(200).json(sites);
+      } else {
+        res.status(404).json({ message: 'No sites found for the given subcategory idriss' });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };

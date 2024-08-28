@@ -12,6 +12,7 @@ router.post('/login', authController.loginUser);
 router.post('/', authController.createUser);
 
 // Routes protégées nécessitant l'authentification et le rôle admin
+router.post('/', authController.createUser);
 router.get('/', authenticateToken, authorizeAdmin, userController.getUsers);
 router.get('/:id', authenticateToken, authorizeAdmin, userController.getUserById);
 router.put('/:id', authenticateToken, authorizeAdmin, userController.updateUser);

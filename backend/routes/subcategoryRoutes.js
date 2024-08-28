@@ -8,6 +8,7 @@ const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddlew
 router.get('/', subcategoryController.getSubcategories);
 router.get('/:id', subcategoryController.getSubcategoryById);
 
+
 // Routes protégées nécessitant l'authentification et le rôle admin
 router.post('/', authenticateToken, authorizeAdmin, subcategoryController.createSubcategory);
 router.put('/:id', authenticateToken, authorizeAdmin, subcategoryController.updateSubcategory);

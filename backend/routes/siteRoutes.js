@@ -7,6 +7,7 @@ const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddlew
 // Routes publiques (GET)
 router.get('/', siteController.getSites);
 router.get('/:id', siteController.getSiteById);
+router.get('/subcategory/:subcategoryId', siteController.getSitesBySubcategoryId);
 
 // Routes protégées nécessitant l'authentification et le rôle admin
 router.post('/', authenticateToken, authorizeAdmin, siteController.createSite);

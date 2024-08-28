@@ -1,5 +1,6 @@
 // controllers/categoryController.js
 const  Category = require('../models/category');
+const Subcategory = require('../models/subcategory');
 
 exports.createCategory = async (req, res) => {
   try {
@@ -13,13 +14,17 @@ exports.createCategory = async (req, res) => {
 exports.getCategories = async (req, res) => {
   
     console.log('Fetching categories...');
-    Category.findAll()
-    .then(categories => {
-      res.send(categories);
-    })
-    .catch(error => {
-      res.status(500).json({ message: error.message });
-    });
+    try {
+        const categories = await Category.findAll({
+          include: {
+            model: Subcategory,
+            attributes: ['id', 'name', 'description']
+          }
+        });
+        res.json(categories);
+      } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
    
 };
 
