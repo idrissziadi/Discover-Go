@@ -2,16 +2,25 @@
 import React from 'react';
 import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { AppBar, Toolbar, Typography, Button, Container, Grid, Card, CardContent, CardActions } from '@mui/material';
-import Theme from './Theme'; // Adjust the path as necessary
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Importez les composants nécessaires
+import Theme from './Theme'; // Ajustez le chemin si nécessaire
 import Home from './pages/Home';
 import LandingPage from './pages/LandingPage';
+import LoginPage from './pages/LoginPage';
+import SignUpPage from './pages/SignUpPage';
 
 function App() {
   return (
     <ThemeProvider theme={Theme}>
       <CssBaseline />
-      <Home/>  
+      <Router>
+        <Routes>
+          <Route path="/" element={<LandingPage />} /> {/* Page d'accueil */}
+          <Route path="/home" element={<Home />} /> {/* Page Home */}
+          <Route path='/login' element={<LoginPage/>} />
+          <Route path='/signup' element={<SignUpPage/>} />
+        </Routes>
+      </Router>
     </ThemeProvider>
   );
 }
