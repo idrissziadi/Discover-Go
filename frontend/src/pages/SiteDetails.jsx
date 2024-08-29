@@ -168,19 +168,25 @@ function SiteDetails() {
                 )}
 
                 {/* Map with additional controls */}
-                {site.location && (
-                  <MapWrapper>
-                    <MapContainer center={site.location} zoom={13} scrollWheelZoom={false}>
-                      <TileLayer
+                {site.address && (
+                <MapWrapper>
+                    <MapContainer
+                        center={[51.505, -0.09]}
+                        zoom={13}
+                        style={{ height: "400px", width: "100%" }}
+                    >
+                        <TileLayer
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                      />
-                      <Marker position={site.location}>
-                        <Popup>{sitename}</Popup>
-                      </Marker>
+                        />
+                        <Marker position={[51.505, -0.09]}>
+                        <Popup>
+                            A pretty CSS3 popup. <br /> Easily customizable.
+                        </Popup>
+                        </Marker>
                     </MapContainer>
-                  </MapWrapper>
-                )}
+                </MapWrapper>
+                            )}
 
                 {/* Reviews Section */}
                 <Box mt={3}>
