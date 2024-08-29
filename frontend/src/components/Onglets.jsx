@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AppBar, Tabs, Tab, Menu, MenuItem, useTheme } from '@mui/material';
+import { AppBar, Tabs, Tab, Menu, MenuItem, useTheme, Button } from '@mui/material';
 
 const Onglets = ({ categories, onCategoryChange, onSubcategoryChange }) => {
   const theme = useTheme();
@@ -35,7 +35,7 @@ const Onglets = ({ categories, onCategoryChange, onSubcategoryChange }) => {
       if (!isMenuOpen) {
         setAnchorEl(null);
       }
-    }, 200);
+    }, 50);
   };
 
   const handleCloseMenu = () => {
@@ -67,7 +67,7 @@ const Onglets = ({ categories, onCategoryChange, onSubcategoryChange }) => {
 
   return (
     <>
-      <AppBar position="static" color="primary">
+      <AppBar position="static" sx={{background : theme.palette.grey[900]}} >
         <Tabs 
           variant="fullWidth"
           value={currentCategory?.id} 
@@ -82,13 +82,13 @@ const Onglets = ({ categories, onCategoryChange, onSubcategoryChange }) => {
               position: 'relative',
             },
             '& .MuiTab-root.Mui-selected': {
-              color: '#FFF',
+              color: theme.palette.common.white,
               '&::after': {
                 content: '""',
                 display: 'block',
                 width: '100%',
                 height: '4px',
-                background: 'white',
+                background: theme.palette.common.white,
                 borderRadius: '2px',
                 position: 'absolute',
                 bottom: 0,
@@ -96,7 +96,7 @@ const Onglets = ({ categories, onCategoryChange, onSubcategoryChange }) => {
               },
             },
             '& .MuiTab-root:not(.Mui-selected)': {
-              color: theme.palette.text.primary,
+              color: theme.palette.primary.main,
             },
           }}
         >
