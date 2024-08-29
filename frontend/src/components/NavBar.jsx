@@ -19,11 +19,11 @@ const NavBar = () => {
           color="inherit" 
           sx={{ 
             marginLeft: theme.spacing(2), 
-            width: 40, // Set width for uniform size
-            height: 40 // Set height for uniform size
+            width: 50, // Set width for uniform size
+            height: 50 // Set height for uniform size
           }}
         >
-          <Avatar alt="User Avatar" src="/path/to/avatar.jpg" sx={{ width: 40, height: 40 }} />
+          <SettingsIcon sx={{ fontSize: 30 }} /> {/* Adjust the font size to match Avatar */}
         </IconButton>
         <IconButton 
           edge="end" 
@@ -34,8 +34,9 @@ const NavBar = () => {
             height: 40 // Set height for uniform size
           }}
         >
-          <SettingsIcon sx={{ fontSize: 30 }} /> {/* Adjust the font size to match Avatar */}
+          <Avatar alt="User Avatar" src="/path/to/avatar.jpg" sx={{ width: 40, height: 40 }} />
         </IconButton>
+
       </Toolbar>
     </AppBar>
   );

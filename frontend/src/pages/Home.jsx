@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
+import { useLocation } from 'react-router-dom';
 import { Grid, Typography } from '@mui/material';
 import NavBar  from '../components/NavBar';
 import SiteCard from '../components/SiteCard';
 import Onglets from '../components/Onglets';
 import Footer from '../components/Footer';
 const Home = () => {
+    const location = useLocation();
+    const {selectedCategoryy , selectedSubcategoryy} = location.state || {};
     const [categories , setCategories] = useState([
         {
             "id": 2,
@@ -148,8 +151,8 @@ const Home = () => {
         { id: 7, name: 'Carnival of Venice', description: 'A world-famous festival known for its elaborate masks.', subcategoryId: 2 },
         // Add more sample data as needed
     ]);
-    const [selectedCategory, setSelectedCategory] = useState(categories[0]);
-    const [selectedSubcategory, setSelectedSubcategory] = useState(selectedCategory.Subcategories[0]);
+    const [selectedCategory, setSelectedCategory] = useState( selectedCategoryy || categories[0]);
+    const [selectedSubcategory, setSelectedSubcategory] = useState( selectedSubcategoryy || selectedCategory.Subcategories[0]);
 
     const handleCategoryChange = (categoryId) => {
         const category = categories.find(cat => cat.id === categoryId);
@@ -189,7 +192,7 @@ const Home = () => {
                 
                 filteredSites.map((site) => (
                 <Grid item key={site.id} xs={12} sm={6} md={4}>
-                    <SiteCard site={site} />
+                    <SiteCard site={site} selectedCategory={selectedCategory} selectedSubcategory={selectedSubcategory}/>
                 </Grid>
                 ))
             )}

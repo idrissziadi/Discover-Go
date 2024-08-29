@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import SignUpPage from './pages/SignUpPage';
+import SiteDetails from './pages/SiteDetails';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/home" element={<Home />} /> {/* Page Home */}
           <Route path='/login' element={<LoginPage/>} />
           <Route path='/signup' element={<SignUpPage/>} />
+          <Route path='/site-details/:sitename' element={<SiteDetails/>} />
         </Routes>
       </Router>
     </ThemeProvider>
