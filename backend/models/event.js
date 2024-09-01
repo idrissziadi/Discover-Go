@@ -47,7 +47,7 @@ const Event = sequelize.define('Event', {
   timestamps: true,
 });
 
-Event.belongsTo(Site, { foreignKey: 'siteId' });
-Site.hasMany(Event, { foreignKey: 'siteId' });
+Event.belongsTo(Site, { foreignKey: 'siteId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
+Site.hasMany(Event, { foreignKey: 'siteId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
 
 module.exports = Event;
