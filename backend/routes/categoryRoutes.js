@@ -4,7 +4,7 @@ const categoryController = require('../controllers/categoryController');
 const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // Routes publiques (GET)
-router.get('/', categoryController.getCategories); // Liste des catégories
+router.get('/', authenticateToken,categoryController.getCategories); // Liste des catégories
 router.get('/:id', categoryController.getCategoryById); // Catégorie spécifique
 
 // Routes protégées nécessitant l'authentification et le rôle admin
