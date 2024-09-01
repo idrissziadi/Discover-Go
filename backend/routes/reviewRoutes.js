@@ -9,8 +9,9 @@ router.get('/', authenticateToken, reviewController.getReviews);
 router.get('/:id', authenticateToken, reviewController.getReviewById);
 
 // Routes protégées nécessitant l'authentification et le rôle admin pour les requêtes POST, PUT, DELETE
-router.post('/', authenticateToken, authorizeAdmin, reviewController.createReview);
-router.put('/:id', authenticateToken, authorizeAdmin, reviewController.updateReview);
-router.delete('/:id', authenticateToken, authorizeAdmin, reviewController.deleteReview);
+// Route protégée nécessitant l'authentification
+router.post('/', authenticateToken, reviewController.createReview);
+router.put('/:id', authenticateToken, reviewController.updateReview);
+router.delete('/:id', authenticateToken, reviewController.deleteReview);
 
 module.exports = router;
