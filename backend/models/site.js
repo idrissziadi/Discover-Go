@@ -58,7 +58,7 @@ const Site = sequelize.define('Site', {
   timestamps: true,
 });
 
-Site.belongsTo(Subcategory, { foreignKey: 'subcategoryId' });
-Subcategory.hasMany(Site, { foreignKey: 'subcategoryId' });
+Site.belongsTo(Subcategory, { foreignKey: 'subcategoryId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
+Subcategory.hasMany(Site, { foreignKey: 'subcategoryId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
 
 module.exports = Site;
