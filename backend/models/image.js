@@ -33,7 +33,7 @@ const Image = sequelize.define('Image', {
   timestamps: false,
 });
 
-Image.belongsTo(Site, { foreignKey: 'siteId' });
-Site.hasMany(Image, { foreignKey: 'siteId' });
+Image.belongsTo(Site, { foreignKey: 'siteId', onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
+Site.hasMany(Image, { foreignKey: 'siteId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
 
 module.exports = Image;
