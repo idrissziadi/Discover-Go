@@ -1,4 +1,4 @@
-// controllers/categoryController.jss
+// controllers/categoryController.js
 const  Category = require('../models/category');
 const Subcategory = require('../models/subcategory');
 
