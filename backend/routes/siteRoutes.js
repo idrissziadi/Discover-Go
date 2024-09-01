@@ -5,7 +5,7 @@ const siteController = require('../controllers/siteController');
 const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // Routes publiques (GET)
-router.get('/', siteController.getSites);
+router.get('/',siteController.getSitesWithReviews);
 router.get('/:id', siteController.getSiteById);
 router.get('/subcategory/:subcategoryId', siteController.getSitesBySubcategoryId);
 
