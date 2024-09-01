@@ -17,29 +17,27 @@ import {
 import CssBaseline from '@mui/material/CssBaseline';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import PersonIcon from '@mui/icons-material/Person';
+import EmailIcon from '@mui/icons-material/Email';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
-import validator from 'validator';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import Theme from './../Theme'; // Importer le thème
-import backgroundImage from './../assets/back.png'; // Assurez-vous que l'image est dans ce chemin
+import Theme from './../Theme';
+import backgroundImage from './../assets/back.png';
+import axios from 'axios'; // Assurez-vous d'avoir installé axios pour les requêtes API.
 
 const validate = (values) => {
   const errors = {};
-
-  // Validation pour le champ username
-  if (!values.username) {
-    errors.username = 'Username is required';
-  } else if (values.username.length < 3) {
-    errors.username = 'Username must be at least 3 characters long';
+  if (!values.email) {
+    errors.email = 'Email is required';
+  } else if (values.email.length < 10) {
+    errors.email = 'Email must be at least 10 characters long';
   }
 
-  // Validation pour le champ password
   if (!values.password) {
     errors.password = 'Password is required';
-  } else if (values.password.length < 6) {
-    errors.password = 'Password must be at least 6 characters long';
+  } else if (values.password.length < 5) {
+    errors.password = 'Password must be at least 5 characters long';
   }
 
   return errors;
@@ -48,6 +46,7 @@ const validate = (values) => {
 const LoginPage = () => {
   const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState('');
   const navigate = useNavigate();
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
@@ -58,6 +57,35 @@ const LoginPage = () => {
   const handleSignUpClick = () => {
     navigate('/signup');
   };
+
+  const handleLogin = async (values, { setSubmitting }) => {
+    try {
+      const response = await axios.post('http://localhost:5000/api/users/login', {
+        email: values.email, // Assurez-vous que l'API attend les bons champs
+        password: values.password,
+      });
+  
+      // Si le token est généré, le stocker dans le localStorage avec les autres informations
+      if (response.data.token) {
+        console.log("token : " , response.data.token);
+        
+        // Stockage du token et des informations de l'utilisateur dans le localStorage
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('user', JSON.stringify({
+          id: response.data.user.id,
+          email: response.data.user.email,
+          username: response.data.user.username
+        }));
+        
+        navigate('/home'); // Rediriger l'utilisateur après la connexion
+      }
+    } catch (error) {
+      setErrorMessage('Invalid email or password');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+  
 
   return (
     <ThemeProvider theme={Theme}>
@@ -80,7 +108,6 @@ const LoginPage = () => {
         }}
       >
         <Container component="main" maxWidth="xs">
-          {/* Texte animé */}
           <Box
             sx={{
               position: 'absolute',
@@ -151,13 +178,15 @@ const LoginPage = () => {
               Sign In
             </Typography>
             <Divider sx={{ my: 2, width: '100%', backgroundColor: theme.palette.divider }} />
+            {errorMessage && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {errorMessage}
+              </Typography>
+            )}
             <Formik
-              initialValues={{ username: '', password: '' }}
+              initialValues={{ email: '', password: '' }}
               validate={validate}
-              onSubmit={(values) => {
-                console.log('Form data', values);
-                // Handle form submission
-              }}
+              onSubmit={handleLogin}
             >
               {({ isSubmitting }) => (
                 <Form>
@@ -166,14 +195,14 @@ const LoginPage = () => {
                     margin="normal"
                     required
                     fullWidth
-                    id="username"
-                    name="username"
-                    label="Username"
-                    placeholder="Enter your username"
+                    id="email"
+                    name="email"
+                    label="Email"
+                    placeholder="Enter your email"
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          <PersonIcon />
+                          <EmailIcon />
                         </InputAdornment>
                       ),
                     }}
@@ -191,7 +220,7 @@ const LoginPage = () => {
                       },
                     }}
                   />
-                  <ErrorMessage name="username" component="div" style={{ color: 'red' }} />
+                  <ErrorMessage name="email" component="div" style={{ color: 'red' }} />
 
                   <Field
                     as={TextField}
