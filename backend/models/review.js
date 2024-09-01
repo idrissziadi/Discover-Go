@@ -45,15 +45,20 @@ const Review = sequelize.define('Review', {
     defaultValue: DataTypes.NOW,
     field: 'created_at',
   },
+  updateAt: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
+    field: 'updatedAt',
+  },
 }, {
   tableName: 'reviews',
   timestamps: true,
 });
 
-Review.belongsTo(Site, { foreignKey: 'siteId' });
-Site.hasMany(Review, { foreignKey: 'siteId' });
+Review.belongsTo(Site, { foreignKey: 'siteId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
+Site.hasMany(Review, { foreignKey: 'siteId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
 
-Review.belongsTo(User, { foreignKey: 'userId' });
-User.hasMany(Review, { foreignKey: 'userId' });
+Review.belongsTo(User, { foreignKey: 'userId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
+User.hasMany(Review, { foreignKey: 'userId' , onDelete: 'CASCADE',   onUpdate: 'CASCADE',});
 
 module.exports = Review;
