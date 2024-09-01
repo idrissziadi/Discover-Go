@@ -23,8 +23,9 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useNavigate } from 'react-router-dom';
 import { Formik, Field, Form, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import Theme from './../Theme'; // Importer le thème
-import backgroundImage from './../assets/back.png'; // Assurez-vous que l'image est dans ce chemin
+import axios from 'axios'; // Import Axios
+import Theme from './../Theme'; // Import the theme
+import backgroundImage from './../assets/back.png'; // Ensure this path is correct
 
 // Validation Schema with Yup
 const validationSchema = Yup.object({
@@ -45,6 +46,26 @@ const SignUpPage = () => {
 
   const handleSignInClick = () => {
     navigate('/login');
+  };
+
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+    try {
+      // Faire une requête POST vers l'endpoint d'inscription de l'API
+      const response = await axios.post('http://localhost:5000/api/users/signup', {
+        username: values.username,
+        email: values.email,
+        password: values.password,
+      });
+      // Rediriger vers la page de connexion après une inscription réussie
+      navigate('/login');
+    } catch (error) {
+      // Gérer les erreurs venant du serveur
+      if (error.response && error.response.data) {
+        setErrors({ api: error.response.data.message });
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -68,7 +89,7 @@ const SignUpPage = () => {
         }}
       >
         <Container component="main" maxWidth="xs">
-          {/* Texte animé */}
+          {/* Animated Text */}
           <Box
             sx={{
               position: 'absolute',
@@ -116,7 +137,7 @@ const SignUpPage = () => {
           <Paper
             elevation={12}
             sx={{
-              padding: 6, // Augmenter la taille du formulaire
+              padding: 6, // Increase form size
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -142,12 +163,9 @@ const SignUpPage = () => {
             <Formik
               initialValues={{ email: '', username: '', password: '' }}
               validationSchema={validationSchema}
-              onSubmit={(values) => {
-                // Handle form submission
-                console.log(values);
-              }}
+              onSubmit={handleSubmit}
             >
-              {({ isSubmitting }) => (
+              {({ isSubmitting, errors }) => (
                 <Form noValidate>
                   <Field name="email">
                     {({ field }) => (
@@ -200,7 +218,6 @@ const SignUpPage = () => {
                         id="username"
                         label="Username"
                         placeholder="Enter your username"
-                       
                         InputProps={{
                           startAdornment: (
                             <InputAdornment position="start">
@@ -287,33 +304,31 @@ const SignUpPage = () => {
                     )}
                   </ErrorMessage>
 
+                  {/* Display API error message */}
+                  {errors.api && (
+                    <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+                      {errors.api}
+                    </Typography>
+                  )}
+
                   <Button
                     type="submit"
                     fullWidth
                     variant="contained"
-                    sx={{ mt: 3, mb: 2, borderRadius: '20px' }} // Rounded button
                     color="primary"
+                    sx={{ mt: 3, mb: 2 }}
                     disabled={isSubmitting}
                   >
                     Sign Up
                   </Button>
+                  <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Link onClick={handleSignInClick} sx={{ cursor: 'pointer' }}>
+                      Already have an account? Sign In
+                    </Link>
+                  </Box>
                 </Form>
               )}
             </Formik>
-
-            <Box sx={{ mt: 2, textAlign: 'center' }}>
-              <Typography variant="body2" color="text.secondary">
-                Already have an account?{' '}
-                <Link
-                  href="#"
-                  onClick={handleSignInClick}
-                  variant="body2"
-                  sx={{ cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  Sign In
-                </Link>
-              </Typography>
-            </Box>
           </Paper>
         </Container>
       </Box>
