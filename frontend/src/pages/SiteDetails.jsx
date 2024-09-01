@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams, useLocation, useNavigate } from 'react-router-dom';
 import {
-  Typography, Box, Paper, Breadcrumbs, Link, Grid, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton,
-  TextField
+  Typography, Box, Paper, Breadcrumbs, Link, Button, Dialog, DialogTitle, DialogContent, DialogActions, IconButton,
+  TextField, Grid
 } from '@mui/material';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -14,11 +14,7 @@ import 'leaflet/dist/leaflet.css';
 import { useSpring, animated } from 'react-spring';
 import CloseIcon from '@mui/icons-material/Close';
 
-import L from 'leaflet';
-
-
-
-// Styles personnalisés
+// Custom Styles
 const StyledWrapper = styled(Box)(({ theme }) => ({
   padding: theme.spacing(4),
   backgroundColor: theme.palette.background.default,
@@ -33,9 +29,23 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   margin: 'auto',
 }));
 
-const Image = styled('img')({
-  maxWidth: '100%',
-  height: 'auto',
+const VideoWrapper = styled('div')({
+  position: 'relative',
+  width: '100%',
+  paddingTop: '56.25%', // 16:9 aspect ratio
+  borderRadius: 12,
+  overflow: 'hidden',
+  margin: 'auto',
+  background: '#000',
+});
+
+const Video = styled('video')({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
   borderRadius: 12,
   transition: 'transform 0.3s',
   '&:hover': {
@@ -45,7 +55,7 @@ const Image = styled('img')({
 
 const StyledCarousel = styled(Carousel)(({ theme }) => ({
   width: '100%',
-  maxWidth: 900,
+  maxWidth: 600,
   margin: 'auto',
   '.carousel .slide': {
     background: theme.palette.grey[200],
@@ -54,7 +64,7 @@ const StyledCarousel = styled(Carousel)(({ theme }) => ({
 
 const MapWrapper = styled(Box)({
   width: '100%',
-  height: '400px',
+  height: '300px',
   borderRadius: 12,
   overflow: 'hidden',
   margin: 'auto',
@@ -87,12 +97,19 @@ const CommentItem = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.grey[100],
 }));
 
+const SectionTitle = styled(Typography)(({ theme }) => ({
+  marginBottom: theme.spacing(2),
+}));
+
 function SiteDetails() {
   const { sitename } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { site, category, subcategory } = location.state || {};
   const [dialogOpen, setDialogOpen] = React.useState(false);
+  const [comment, setComment] = React.useState('');
+  const [rating, setRating] = React.useState('');
+
 
   const handleSubcategoryClick = () => {
     navigate('/home', { state: { selectedCategoryy: category, selectedSubcategoryy: subcategory } });
@@ -111,7 +128,35 @@ function SiteDetails() {
 
   // Animation for the page
   const fadeIn = useSpring({ opacity: 1, from: { opacity: 0 } });
-
+  const handleSubmitReview = async () => {
+    const token = localStorage.getItem('token'); // Assuming token is stored in localStorage
+    const siteId = site.id; // Ensure this is correctly defined
+  
+    try {
+      const response = await fetch('http://localhost:5000/api/reviews', { // Replace with your API endpoint
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ siteId, comment, rating }),
+      });
+  
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Review added:', result);
+        // Optionally, you might want to update the UI or show a success message
+        setComment('');
+        setRating('');
+      } else {
+        console.error('Failed to add review');
+        // Handle error response
+      }
+    } catch (error) {
+      console.error('Error adding review:', error);
+      // Handle request error
+    }
+  };
   return (
     <>
       <NavBar onHomeClick={handleHomeClick} />
@@ -142,164 +187,168 @@ function SiteDetails() {
         </Breadcrumbs>
 
         <animated.div style={fadeIn}>
-          <StyledPaper elevation={3}>
-            <Typography variant="h4" gutterBottom>
-              Détails du Site
-            </Typography>
-            <Typography variant="h5" color="textPrimary">
-              Nom du Site : {sitename}
-            </Typography>
-
-            {site && (
-              <>
-                <Typography variant="body1" color="textSecondary" paragraph>
-                  {site.description}
+          <Grid container spacing={3}>
+            {/* Left side: Information and Map */}
+            <Grid item xs={12} md={6}>
+              <StyledPaper elevation={3}>
+                <Typography variant="h4" gutterBottom>
+                  Détails du Site
                 </Typography>
-                
-                {/* Enhanced Carousel */}
-                {site.images && site.images.length > 0 && (
-                  <StyledCarousel showThumbs={false} showStatus={false} infiniteLoop={true} autoPlay={true}>
-                    {site.images.map((img, index) => (
-                      <div key={index}>
-                        <Image src={img} alt={`Image ${index + 1}`} />
-                      </div>
-                    ))}
-                  </StyledCarousel>
+                <Typography variant="h5" color="textPrimary">
+                  Nom du Site : {sitename}
+                </Typography>
+
+                {site && (
+                  <>
+                    <Typography variant="body1" color="textSecondary" paragraph>
+                      {site.description}
+                    </Typography>
+                    
+                    {site.address && (
+                      <Typography variant="body1" color="textSecondary" paragraph>
+                        <strong>Adresse :</strong> {site.address}
+                      </Typography>
+                    )}
+
+                    {site.history && (
+                      <Typography variant="body1" color="textSecondary" paragraph>
+                        <strong>Historique :</strong> {site.history}
+                      </Typography>
+                    )}
+
+                    {site.latitude && site.longitude && (
+                      <MapWrapper>
+                        <MapContainer
+                          center={[parseFloat(site.latitude), parseFloat(site.longitude)]}
+                          zoom={13}
+                          style={{ height: "100%", width: "100%" }}
+                        >
+                          <TileLayer
+                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                          />
+                          <Marker position={[parseFloat(site.latitude), parseFloat(site.longitude)]}>
+                            <Popup>
+                              {site.name}<br />{site.address}
+                            </Popup>
+                          </Marker>
+                        </MapContainer>
+                      </MapWrapper>
+                    )}
+
+                    <Box mt={3}>
+                      <SectionTitle variant="h6" color="textPrimary">
+                        Avis
+                      </SectionTitle>
+                      {site.Reviews && site.Reviews.length > 0 ? (
+                        site.Reviews.map((review) => (
+                          <ReviewCard key={review.id}>
+                            <Typography variant="h6" color="textPrimary">
+                              Note : {review.rating}/5
+                            </Typography>
+                            <Typography variant="body1" color="textSecondary">
+                              {review.comment}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                              - {review.User.username}
+                            </Typography>
+                          </ReviewCard>
+                        ))
+                      ) : (
+                        <Typography variant="body1" color="textSecondary">
+                          Aucun avis disponible.
+                        </Typography>
+                      )}
+                    </Box>
+
+                    <Box mt={3}>
+                      <SectionTitle variant="h6" color="textPrimary">
+                        Laissez un Commentaire
+                      </SectionTitle>
+                      <TextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        variant="outlined"
+                        placeholder="Votre commentaire"
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        sx={{ marginBottom: 2 }}
+                      />
+                      <TextField
+                        fullWidth
+                        type="number"
+                        variant="outlined"
+                        placeholder="Votre note (1-5)"
+                        value={rating}
+                        onChange={(e) => setRating(e.target.value)}
+                        sx={{ marginBottom: 2 }}
+                      />
+                      <Button variant="contained" color="primary" onClick={handleSubmitReview}>
+                        Soumettre
+                      </Button>
+                    </Box>
+
+
+                    {site.Events && site.Events.length > 0 && (
+                      <Box mt={3}>
+                        <Button variant="contained" color="secondary" onClick={handleDialogOpen}>
+                          Voir les Événements
+                        </Button>
+                      </Box>
+                    )}
+
+                    {category && (
+                      <Typography variant="h6" color="textSecondary">
+                        Catégorie : {category.name}
+                      </Typography>
+                    )}
+
+                    {subcategory && (
+                      <Typography variant="body1" color="textSecondary">
+                        Sous-catégorie : {subcategory.name}
+                      </Typography>
+                    )}
+                  </>
                 )}
+              </StyledPaper>
+            </Grid>
 
-                {/* Map with additional controls */}
-                {site.address && (
-                <MapWrapper>
-                    <MapContainer
-                        center={[51.505, -0.09]}
-                        zoom={13}
-                        style={{ height: "400px", width: "100%" }}
-                    >
-                        <TileLayer
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        />
-                        <Marker position={[51.505, -0.09]}>
-                        <Popup>
-                            A pretty CSS3 popup. <br /> Easily customizable.
-                        </Popup>
-                        </Marker>
-                    </MapContainer>
-                </MapWrapper>
-                            )}
-
-                {/* Reviews Section */}
-                <Box mt={3}>
-                  <Typography variant="h6" color="textPrimary">
-                    Avis
-                  </Typography>
-                  <ReviewCard>
-                    <Typography variant="h6" color="textPrimary">
-                      Note : 4.5/5
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      "Un endroit fantastique à visiter ! Les installations sont excellentes et le personnel est très accueillant."
-                    </Typography>
-                  </ReviewCard>
-                  <ReviewCard>
-                    <Typography variant="h6" color="textPrimary">
-                      Note : 4/5
-                    </Typography>
-                    <Typography variant="body1" color="textSecondary">
-                      "Belle expérience, mais quelques améliorations pourraient être apportées dans le service client."
-                    </Typography>
-                  </ReviewCard>
-                </Box>
-
-                {/* Comments Section */}
-                <CommentList>
-                  <Typography variant="h6" color="textPrimary">
-                    Commentaires
-                  </Typography>
-                  <CommentItem>
-                    <Typography variant="body1" color="textSecondary">
-                      <strong>Jean Dupont:</strong> Super endroit ! Très agréable.
-                    </Typography>
-                  </CommentItem>
-                  <CommentItem>
-                    <Typography variant="body1" color="textSecondary">
-                      <strong>Marie Martin:</strong> Je recommande vivement !
-                    </Typography>
-                  </CommentItem>
-                </CommentList>
-
-                {/* Comment Form */}
-                <Box mt={3}>
-                  <Typography variant="h6" color="textPrimary">
-                    Laissez un Commentaire
-                  </Typography>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    variant="outlined"
-                    placeholder="Votre commentaire"
-                    sx={{ marginBottom: 2 }}
-                  />
-                  <Button variant="contained" color="primary">
-                    Soumettre
-                  </Button>
-                </Box>
-
-                {/* Events Button */}
-                {site.events && site.events.length > 0 && (
-                  <Box mt={3}>
-                    <Button variant="contained" color="secondary" onClick={handleDialogOpen}>
-                      Voir les Événements
-                    </Button>
-                  </Box>
-                )}
-
-                {category && (
-                  <Typography variant="h6" color="textSecondary">
-                    Catégorie : {category.name}
-                  </Typography>
-                )}
-
-                {subcategory && (
-                  <Typography variant="body1" color="textSecondary">
-                    Sous-catégorie : {subcategory.name}
-                  </Typography>
-                )}
-              </>
-            )}
-          </StyledPaper>
+            {/* Right side: Video Carousel */}
+            <Grid item xs={12} md={6}>
+              {site && site.Images && site.Images.length > 0 && (
+                <StyledCarousel showThumbs={false} showStatus={false} infiniteLoop={true} autoPlay={true}>
+                  {site.Images.map((videoUrl, index) => (
+                    <div key={index}>
+                      <VideoWrapper>
+                        <Video controls>
+                          <source src={videoUrl.imageUrl} type="video/mp4" />
+                          Votre navigateur ne supporte pas la balise vidéo.
+                        </Video>
+                      </VideoWrapper>
+                    </div>
+                  ))}
+                </StyledCarousel>
+              )}
+            </Grid>
+          </Grid>
         </animated.div>
-      </StyledWrapper>
 
-      {/* Event Dialog */}
-      {site.events && site.events.length > 0 && (
-        <EventDialog open={dialogOpen} onClose={handleDialogClose} fullWidth maxWidth="md">
+        <EventDialog open={dialogOpen} onClose={handleDialogClose}>
           <DialogTitle>
-            Événements
+            <Typography variant="h6">Événements</Typography>
             <IconButton
               edge="end"
               color="inherit"
               onClick={handleDialogClose}
               aria-label="close"
-              sx={{ position: 'absolute', right: 8, top: 8 }}
+              sx={{ position: 'absolute', top: 8, right: 8 }}
             >
               <CloseIcon />
             </IconButton>
           </DialogTitle>
           <DialogContent>
-            <Box>
-              {site.events.map((event, index) => (
-                <Box key={index} mb={2}>
-                  <Typography variant="h6" color="textPrimary">
-                    {event.title}
-                  </Typography>
-                  <Typography variant="body1" color="textSecondary">
-                    {event.description}
-                  </Typography>
-                </Box>
-              ))}
-            </Box>
+            {/* Map of events */}
           </DialogContent>
           <DialogActions>
             <Button onClick={handleDialogClose} color="primary">
@@ -307,7 +356,7 @@ function SiteDetails() {
             </Button>
           </DialogActions>
         </EventDialog>
-      )}
+      </StyledWrapper>
 
       <Footer />
     </>
