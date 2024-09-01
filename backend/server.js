@@ -2,7 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 require('dotenv').config();
-
+const path = require('path');
 // Importer Sequelize pour la connexion à la base de données
 const sequelize = require('./config/db');
 
@@ -12,6 +12,8 @@ const port = process.env.PORT || 5000;
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+// Serve the "videos" folder as static content
+app.use('/videos', express.static(path.join(__dirname, 'videos')));
 
 // Test de la connexion à la base de données avec Sequelize
 sequelize.authenticate()
