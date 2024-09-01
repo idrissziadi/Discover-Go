@@ -1,14 +1,10 @@
 // controllers/reviewController.js
 const  Review  = require('../models/review');
+const Site = require('../models/site');
+const jwt = require('jsonwebtoken');
 
-exports.createReview = async (req, res) => {
-  try {
-    const review = await Review.create(req.body);
-    res.status(201).json(review);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+
+
 
 exports.getReviews = async (req, res) => {
   try {
@@ -58,6 +54,38 @@ exports.deleteReview = async (req, res) => {
     } else {
       res.status(404).json({ message: 'Review not found' });
     }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+// Méthode pour ajouter une critique
+exports.createReview = async (req, res) => {
+  try {
+    // Vérifiez le token d'authentification
+    const token = req.headers.authorization.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Assurez-vous d'utiliser la même clé que pour signer le token
+
+    const { siteId, comment, rating } = req.body;
+
+    if (!siteId || !comment || !rating) {
+      return res.status(400).json({ message: 'Tous les champs sont requis' });
+    }
+
+    // Vérifiez si le site existe
+    const site = await Site.findByPk(siteId);
+    if (!site) {
+      return res.status(404).json({ message: 'Site non trouvé' });
+    }
+
+    // Créez la critique
+    const review = await Review.create({
+      siteId,
+      userId: decoded.id, // Assurez-vous que l'ID utilisateur est extrait du token
+      comment,
+      rating,
+    });
+
+    res.status(201).json(review);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
