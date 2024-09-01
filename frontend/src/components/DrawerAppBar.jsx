@@ -101,16 +101,16 @@ function DrawerAppBar(props) {
                     color: 'text.secondary',
                     '&.Mui-selected': {
                     fontWeight: 700,
-                    color: 'error.main', // Couleur du texte de l'onglet sélectionné
+                    color: '#FFF', // Couleur du texte de l'onglet sélectionné
                     '& .MuiSvgIcon-root': {
-                        color: 'error.main', // Couleur de l'icône de l'onglet sélectionné
+                        color: '#FFF', // Couleur de l'icône de l'onglet sélectionné
                     },
                     '&::after': {
                         content: '""',
                         display: 'block',
                         width: '100%',
                         height: '4px',
-                        background: 'secondary.main', // Couleur de la sous-ligne
+                        background: '#FFF', // Couleur de la sous-ligne
                         borderRadius: '2px',
                         position: 'absolute',
                         bottom: 0,
