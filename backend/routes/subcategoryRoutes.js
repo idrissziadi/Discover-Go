@@ -9,7 +9,7 @@ router.get('/', subcategoryController.getSubcategories);
 router.get('/:id', subcategoryController.getSubcategoryById);
 
 
-// Routes protégées nécessitant l'authentification et le rôle admin
+// Routes protégées nécessitant l'authentification et le rôle adminn
 router.post('/', authenticateToken, authorizeAdmin, subcategoryController.createSubcategory);
 router.put('/:id', authenticateToken, authorizeAdmin, subcategoryController.updateSubcategory);
 router.delete('/:id', authenticateToken, authorizeAdmin, subcategoryController.deleteSubcategory);
